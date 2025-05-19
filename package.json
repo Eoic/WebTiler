@@ -1,5 +1,9 @@
 {
-  "name": "typescript-vite-starter",
+  "name": "webtiler",
+  "description": "A web-based tiling window manager.",
+  "author": "Karolis Strazdas",
+  "license": "MIT",
+  "homepage": "https://github.com/Eoic/webtiler",
   "private": false,
   "version": "0.0.1",
   "type": "module",
@@ -16,6 +20,6 @@
     "sass": "^1.69.5",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.7.1",
-    "vite": "^5.0.8"
+    "vite": "^6.3.5"
   }
 }
