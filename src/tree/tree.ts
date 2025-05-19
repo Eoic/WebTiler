@@ -1,3 +1,5 @@
+import { Window } from '../window';
+
 type Orientation = 'vertical' | 'horizontal';
 
 interface SplitNode {
@@ -6,56 +8,59 @@ interface SplitNode {
   parent: SplitNode | null;
   orientation: Orientation;
   children: [LayoutNode, LayoutNode];
+//   window: T | null;
   element: HTMLElement | null;
 }
 
-interface LeafNode {
+interface LeafNode<T extends Window = Window> {
   type: 'leaf';
-  windowId: string;
+//   windowId: string;
   parent: SplitNode | null;
-  element: HTMLElement | null;
+  window: T | null;
+//   element: HTMLElement | null;
 }
 
 type LayoutNode = SplitNode | LeafNode;
 
-export class LayoutTree {
+export class LayoutTree<T extends Window = Window> {
     public root: LayoutNode | null = null;
     public focused: LeafNode | null = null;
 
-    public openFirst(windowId: string) {
-        const element = document.createElement('div');
-        element.className = 'window';
-        element.innerText = windowId;
+    public openFirst(window: T) {
+        // const element = document.createElement('div');
+        // element.className = 'window';
+        // element.innerText = windowId;
 
         this.root = {
             type: 'leaf',
-            windowId,
             parent: null,
-            element,
+            window,
         };
     }
 
-    public findLeaf(windowId: string, node: LayoutNode | null = this.root): LeafNode | null {
+    public findLeaf(windowId: number, node: LayoutNode | null = this.root): LeafNode | null {
         if (!node) return null;
-        if (node.type === 'leaf') return node.windowId === windowId ? node : null;
+        if (node.type === 'leaf') return node.window?.id === windowId ? node : null;
         return this.findLeaf(windowId, node.children[0]) || this.findLeaf(windowId, node.children[1]);
     }
 
     public splitLeaf(
         leaf: LeafNode,
         orientation: Orientation,
-        newWindowId: string,
+        newWindow: T,
+        // newWindowId: string,
         fraction = 0.5
     ) {
-        const newLeafElement = document.createElement('div');
-        newLeafElement.className = 'window';
-        newLeafElement.innerText = newWindowId;
+        // const newLeafElement = document.createElement('div');
+        // newLeafElement.className = 'window';
+        // newLeafElement.innerText = newWindowId;
 
         const newLeaf: LeafNode = {
             type: 'leaf',
-            windowId: newWindowId,
+            // windowId: newWindowId,
             parent: null,
-            element: newLeafElement,
+            window: newWindow,
+            // element: newLeafElement,
         };
 
         const splitElement = document.createElement('div');
@@ -70,13 +75,13 @@ export class LayoutTree {
             element: splitElement,
         };
 
-        if (leaf.element?.parentElement) 
-            leaf.element.parentElement.replaceChild(splitElement, leaf.element);
+        if (leaf.window?.element?.parentElement) 
+            leaf.window.element.parentElement.replaceChild(splitElement, leaf.window.element);
     
         leaf.parent = split;
         newLeaf.parent = split;
-        split.element?.appendChild(leaf.element!);
-        split.element?.appendChild(newLeafElement);
+        split.element?.appendChild(leaf.window!.element);
+        split.element?.appendChild(newLeaf.window!.element);
 
         if (!split.parent) 
             this.root = split;
@@ -109,14 +114,15 @@ export class LayoutTree {
 
     public splitFocused(
         orientation: Orientation,
-        newWindowId: string,
+        // newWindowId: string,
+        newWindow: T,
         fraction = 0.5
     ) {
         if (!this.focused)
             return;
 
-        this.splitLeaf(this.focused, orientation, newWindowId, fraction);
-        const newLeaf = this.findLeaf(newWindowId);
+        this.splitLeaf(this.focused, orientation, newWindow, fraction);
+        const newLeaf = this.findLeaf(newWindow.id);
 
         if (newLeaf)
             this.focused = newLeaf;
@@ -138,7 +144,7 @@ export class LayoutTree {
         this.focused = sibling && sibling.type === 'leaf' ? sibling : null;
     }
 
-    public focus(windowId: string) {
+    public focus(windowId: number) {
         const leaf = this.findLeaf(windowId);
         if (leaf) this.focused = leaf;
     }
