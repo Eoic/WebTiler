@@ -4,11 +4,11 @@
   height: 100%;
   display: grid;
 
-  &.vertical-split {
+  &.horizontal-split {
     grid-template-columns: 1fr 1fr;
   }
 
-  &.horizontal-split {
+  &.vertical-split {
     grid-template-rows: 1fr 1fr;
   }
 

@@ -6,12 +6,14 @@ interface SplitNode {
   parent: SplitNode | null;
   orientation: Orientation;
   children: [LayoutNode, LayoutNode];
+  element: HTMLElement | null;
 }
 
 interface LeafNode {
   type: 'leaf';
   windowId: string;
   parent: SplitNode | null;
+  element: HTMLElement | null;
 }
 
 type LayoutNode = SplitNode | LeafNode;
@@ -21,10 +23,15 @@ export class LayoutTree {
     public focused: LeafNode | null = null;
 
     public openFirst(windowId: string) {
+        const element = document.createElement('div');
+        element.className = 'window';
+        element.innerText = windowId;
+
         this.root = {
             type: 'leaf',
             windowId,
             parent: null,
+            element,
         };
     }
 
@@ -40,7 +47,19 @@ export class LayoutTree {
         newWindowId: string,
         fraction = 0.5
     ) {
-        const newLeaf: LeafNode = { type: 'leaf', windowId: newWindowId, parent: null, };
+        const newLeafElement = document.createElement('div');
+        newLeafElement.className = 'window';
+        newLeafElement.innerText = newWindowId;
+
+        const newLeaf: LeafNode = {
+            type: 'leaf',
+            windowId: newWindowId,
+            parent: null,
+            element: newLeafElement,
+        };
+
+        const splitElement = document.createElement('div');
+        splitElement.className = `grid ${orientation}-split`;
 
         const split: SplitNode = {
             type: 'split',
@@ -48,16 +67,24 @@ export class LayoutTree {
             fraction,
             children: [leaf, newLeaf],
             parent: leaf.parent,
+            element: splitElement,
         };
 
+        if (leaf.element?.parentElement) 
+            leaf.element.parentElement.replaceChild(splitElement, leaf.element);
+    
         leaf.parent = split;
         newLeaf.parent = split;
+        split.element?.appendChild(leaf.element!);
+        split.element?.appendChild(newLeafElement);
 
         if (!split.parent) 
             this.root = split;
         else {
             const { children, } = split.parent;
-            if (children[0] === leaf) children[0] = split;
+
+            if (children[0] === leaf)
+                children[0] = split;
             else children[1] = split;
         }
     }
@@ -132,4 +159,3 @@ export class LayoutTree {
         }
     }
 }
-
