@@ -1,6 +1,8 @@
-# TypeScript Vite starter template
+# WebTiler
 
-Front-end TypeScript starter with Vite and ESLint configuration.
+A tiling window manager for the web.
+
+WebTiler is a web-based tiling window manager that allows you to manage your windows in a grid layout. It is designed to be lightweight and easy to use, with a focus on keyboard shortcuts and efficient window management.
 
 ### Installation and usage
 
