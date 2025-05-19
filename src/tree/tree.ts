@@ -8,16 +8,13 @@ interface SplitNode {
   parent: SplitNode | null;
   orientation: Orientation;
   children: [LayoutNode, LayoutNode];
-//   window: T | null;
   element: HTMLElement | null;
 }
 
 interface LeafNode<T extends Window = Window> {
   type: 'leaf';
-//   windowId: string;
   parent: SplitNode | null;
   window: T | null;
-//   element: HTMLElement | null;
 }
 
 type LayoutNode = SplitNode | LeafNode;
@@ -27,20 +24,47 @@ export class LayoutTree<T extends Window = Window> {
     public focused: LeafNode | null = null;
 
     public openFirst(window: T) {
-        // const element = document.createElement('div');
-        // element.className = 'window';
-        // element.innerText = windowId;
-
         this.root = {
             type: 'leaf',
             parent: null,
             window,
         };
+
+        console.log(this.root.window?.element);
+
+        if (!this.root.window)
+            throw new Error('Window element is null');
+
+        document.body.appendChild(this.root.window.element);
+
+        console.log(this.root.window.element.parentElement);
+
+        this.root.window.element.parentElement!.addEventListener('click', (event) => {
+            if (!event.target)
+                return;
+
+            const windowElement = (event.target as HTMLElement).closest('.window');
+
+            if (!windowElement)
+                return;
+
+            const windowId = windowElement.getAttribute('data-window-id');
+
+            if (!windowId)
+                return;
+
+            this.focus(windowId);
+            this.focused?.window?.focus();
+        });
     }
 
-    public findLeaf(windowId: number, node: LayoutNode | null = this.root): LeafNode | null {
-        if (!node) return null;
-        if (node.type === 'leaf') return node.window?.id === windowId ? node : null;
+    public findLeaf(windowId: string, node: LayoutNode | null = this.root): LeafNode | null {
+        if (!node)
+            return null;
+
+        if (node.type === 'leaf')
+            return node.window?.id === windowId ? node : null;
+
         return this.findLeaf(windowId, node.children[0]) || this.findLeaf(windowId, node.children[1]);
     }
 
@@ -48,19 +72,12 @@ export class LayoutTree<T extends Window = Window> {
         leaf: LeafNode,
         orientation: Orientation,
         newWindow: T,
-        // newWindowId: string,
         fraction = 0.5
     ) {
-        // const newLeafElement = document.createElement('div');
-        // newLeafElement.className = 'window';
-        // newLeafElement.innerText = newWindowId;
-
         const newLeaf: LeafNode = {
             type: 'leaf',
-            // windowId: newWindowId,
             parent: null,
             window: newWindow,
-            // element: newLeafElement,
         };
 
         const splitElement = document.createElement('div');
@@ -144,9 +161,14 @@ export class LayoutTree<T extends Window = Window> {
         this.focused = sibling && sibling.type === 'leaf' ? sibling : null;
     }
 
-    public focus(windowId: number) {
+    public focus(windowId: string) {
+        if (this.focused)
+            this.focused.window?.blur();
+
         const leaf = this.findLeaf(windowId);
-        if (leaf) this.focused = leaf;
+
+        if (leaf)
+            this.focused = leaf;
     }
 
     public traverse(callback: (leaf: LeafNode) => void) {

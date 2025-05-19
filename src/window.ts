@@ -1,5 +1,5 @@
 export class Window {
-    public readonly id: number;
+    public readonly id: string;
     public readonly title: string;
     public readonly element: HTMLElement;
 
@@ -15,23 +15,17 @@ export class Window {
         this.element.classList.remove('focused');
     }
 
-    constructor(id: number, title: string) {
+    constructor(id: string, title: string) {
         this.id = id;
         this.title = title;
         this.element = this.create();
-
-        // this.element.addEventListener('click', () => {
-        //     if (this._isFocused) 
-        //         this.blur();
-        //     else 
-        //         this.focus();
-        // });
     }
 
     public create(): HTMLElement {
         const element = document.createElement('div');
         element.className = 'window';
         element.innerText = this.title;
+        element.setAttribute('data-window-id', this.id);
         return element;
     }
 }
