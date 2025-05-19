@@ -1,2 +1,9 @@
 .window {
+    padding: 1rem;
+    border-radius: 6px;
+    transition: 0.15s background-color ease-in-out;
+
+    &:hover {
+        background-color: #3d3d3d;
+    }
 }

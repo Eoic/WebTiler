@@ -1,5 +1,23 @@
-// Styles for grid/layout
-
 .grid {
-  /* ...grid styles... */
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  display: grid;
+
+  &.vertical-split {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &.horizontal-split {
+    grid-template-rows: 1fr 1fr;
+  }
+
+  &.full-screen {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  > .window {
+    outline: 1px solid crimson;
+  }
 }
