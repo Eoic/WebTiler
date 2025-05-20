@@ -1,8 +1,6 @@
 # WebTiler
 
-A tiling window manager for the web.
-
-WebTiler is a web-based tiling window manager that allows you to manage your windows in a grid layout. It is designed to be lightweight and easy to use, with a focus on keyboard shortcuts and efficient window management.
+A tiling window manager for the web. It's a web-based tiling window manager that allows you to manage your windows in a grid layout. It is intended to be lightweight and easy to use, with a focus on keyboard shortcuts and extensive configuration options.
 
 ### Installation and usage
 
@@ -18,4 +16,4 @@ WebTiler is a web-based tiling window manager that allows you to manage your win
    npm run dev
    ```
 
-For lint and build commands, see [package.json](./package.json).
+For other commands, see [package.json](./package.json).
