@@ -79,6 +79,21 @@ export class LayoutTree<T extends Window = Window> {
         return this.findLeaf(node.children[1]);
     }
 
+    public findLastLeaf(node: LayoutNode | null = this.root): LeafNode | null {
+        if (!node)
+            return null;
+
+        if (node.type === 'leaf')
+            return node;
+
+        const rightLeaf = this.findLastLeaf(node.children[1]);
+            
+        if (rightLeaf)
+            return rightLeaf;
+
+        return this.findLastLeaf(node.children[0]);
+    }
+
     public splitLeaf(
         leaf: LeafNode,
         orientation: Orientation,
@@ -177,55 +192,47 @@ export class LayoutTree<T extends Window = Window> {
 
         const leaf = this.findLeafById(windowId);
 
-        if (leaf)
+        if (leaf) {
             this.focused = leaf;
+            this.focused.window?.focus();
+        }
     }
 
     public focusNext() {
-        if (!this.focused)
-            return;
+        if (this.focused?.parent?.children[0] === this.focused) {
+            const nextLeaf = this.findLeaf(this.focused.parent.children[1]);
 
-        const nextLeaf = this.findLeaf(this.focused.parent);
+            if (nextLeaf && nextLeaf.window)
+                this.focus(nextLeaf.window.id);
+        } else {
+            const nextLeaf = this.findLeaf(this.root);
 
-        if (nextLeaf) 
-            console.log('focusNext', nextLeaf);
-        else
-            console.log('Cannot find next leaf');
-        
-        // console.log('focusNext', this.focused);
-        // if (!this.focused && this.root?.type === 'split' && this.root.children.length > 0) {
-        //     const nextFocus = this.findLeafById(this.root);
-        //     // console.log(this.root);
-        //     // (this.root as LeafNode).window!.focus();
-        //     // this.focused = this.root as LeafNode;
-        //     // this.focus(this.root.children[0].);
-        //     return;
-        // }
-       
-        // const parent = this.focused.parent;
+            if (nextLeaf && nextLeaf.window)
+                this.focus(nextLeaf.window?.id);
+        }
+    }
 
-        // if (!parent) {
+    public focusPrev() {
+        if (this.focused?.parent?.children[1] === this.focused) {
+            const prevLeaf = this.findLeaf(this.focused.parent.children[0]);
 
-        //     return;
-        // }
+            if (prevLeaf && prevLeaf.window)
+                this.focus(prevLeaf.window.id);
+        } else {
+            const grandparent = this.focused?.parent?.parent;
 
-        // const sibling = parent.children[0] === this.focused ? parent.children[1] : parent.children[0];
+            if (grandparent) {
+                const prevLeaf = this.findLeaf(grandparent.children[0]);
 
+                if (prevLeaf && prevLeaf.window)
+                    this.focus(prevLeaf.window.id);
+            } else {
+                const lastLeaf = this.findLastLeaf(this.root);
 
-        // if (sibling.type === 'leaf') {
-
-        //     this.focus(sibling.window!.id);
-
-        //     sibling.window?.focus();
-
-        // else {
-        //     const nextLeaf = this.findLeaf(sibling.);
-
-        //     if (nextLeaf) {
-        //         this.focus(nextLeaf.window!.id);
-        //         nextLeaf.window?.focus();
-        //     }
-        // }
+                if (lastLeaf && lastLeaf.window)
+                    this.focus(lastLeaf.window.id);
+            }
+        }
     }
 
     public traverse(callback: (leaf: LeafNode) => void) {

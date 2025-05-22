@@ -13,8 +13,8 @@ export type HotkeyCallback = (action: HotkeyAction, event: KeyboardEvent) => voi
 
 const DEFAULT_HOTKEYS: HotkeyConfig = {
     'close': 'Shift+W',
+    'focus-prev': 'Shift+Enter',
     'focus-next': 'Shift+Tab',
-    'focus-prev': 'Shift+Alt+Tab',
     'split-horizontal': 'Shift+Enter',
     'split-vertical': 'Shift+Alt+Enter',
 };

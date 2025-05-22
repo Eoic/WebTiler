@@ -33,22 +33,20 @@ tree.splitLeaf(w3Leaf, 'horizontal', w4Window);
 
 const manager = new KeyboardManager();
 
-manager.onAction((action, event) => {
+manager.onAction((action, _event) => {
     switch (action) {
     case 'split-horizontal':
-        // tree.splitLeaf(w1Leaf, 'horizontal', new SimpleWindow('5', 'w5'));
         break;
     case 'split-vertical':
-        // tree.splitLeaf(w1Leaf, 'vertical', new SimpleWindow('6', 'w6'));
         break;
     case 'close':
-        // tree.closeLeaf(w1Leaf);
         break;
     case 'focus-next':
         tree.focusNext();
         break;
-    default:
-        console.log(`Unhandled action: ${action}`);
+    case 'focus-prev':
+        tree.focusPrev();
+        break;
     }
 });
 
