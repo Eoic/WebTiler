@@ -1,4 +1,5 @@
 import '../styles/main.scss';
+import { KeyboardManager } from './keyboard';
 import { LayoutTree } from './tree/tree';
 import { SimpleWindow } from './windows/simpleWindow';
 
@@ -6,7 +7,7 @@ const tree = new LayoutTree();
 
 const w1Window = new SimpleWindow('1', 'w1');
 tree.openFirst(w1Window);
-const w1Leaf = tree.findLeaf(w1Window.id);
+const w1Leaf = tree.findLeafById(w1Window.id);
 
 if (!w1Leaf) 
     throw new Error('Leaf not found');
@@ -14,7 +15,7 @@ if (!w1Leaf)
 const w2Window = new SimpleWindow('2', 'w2');
 tree.splitLeaf(w1Leaf, 'horizontal', w2Window);
 
-const w2Leaf = tree.findLeaf(w2Window.id);
+const w2Leaf = tree.findLeafById(w2Window.id);
 
 if (!w2Leaf) 
     throw new Error('Leaf not found');
@@ -22,10 +23,33 @@ if (!w2Leaf)
 const w3Window = new SimpleWindow('3', 'w3');
 tree.splitLeaf(w2Leaf, 'vertical', w3Window);
 
-const w3Leaf = tree.findLeaf(w3Window.id);
+const w3Leaf = tree.findLeafById(w3Window.id);
 
 if (!w3Leaf) 
     throw new Error('Leaf not found');
 
 const w4Window = new SimpleWindow('4', 'w4');
 tree.splitLeaf(w3Leaf, 'horizontal', w4Window);
+
+const manager = new KeyboardManager();
+
+manager.onAction((action, event) => {
+    switch (action) {
+    case 'split-horizontal':
+        // tree.splitLeaf(w1Leaf, 'horizontal', new SimpleWindow('5', 'w5'));
+        break;
+    case 'split-vertical':
+        // tree.splitLeaf(w1Leaf, 'vertical', new SimpleWindow('6', 'w6'));
+        break;
+    case 'close':
+        // tree.closeLeaf(w1Leaf);
+        break;
+    case 'focus-next':
+        tree.focusNext();
+        break;
+    default:
+        console.log(`Unhandled action: ${action}`);
+    }
+});
+
+manager.enable();

@@ -30,14 +30,10 @@ export class LayoutTree<T extends Window = Window> {
             window,
         };
 
-        console.log(this.root.window?.element);
-
         if (!this.root.window)
             throw new Error('Window element is null');
 
         document.body.appendChild(this.root.window.element);
-
-        console.log(this.root.window.element.parentElement);
 
         this.root.window.element.parentElement!.addEventListener('click', (event) => {
             if (!event.target)
@@ -58,14 +54,29 @@ export class LayoutTree<T extends Window = Window> {
         });
     }
 
-    public findLeaf(windowId: string, node: LayoutNode | null = this.root): LeafNode | null {
+    public findLeafById(windowId: string, node: LayoutNode | null = this.root): LeafNode | null {
         if (!node)
             return null;
 
         if (node.type === 'leaf')
             return node.window?.id === windowId ? node : null;
 
-        return this.findLeaf(windowId, node.children[0]) || this.findLeaf(windowId, node.children[1]);
+        return this.findLeafById(windowId, node.children[0]) || this.findLeafById(windowId, node.children[1]);
+    }
+
+    public findLeaf(node: LayoutNode | null = this.root): LeafNode | null {
+        if (!node)
+            return null;
+
+        if (node.type === 'leaf')
+            return node;
+
+        const leftLeaf = this.findLeaf(node.children[0]);
+
+        if (leftLeaf)
+            return leftLeaf;
+
+        return this.findLeaf(node.children[1]);
     }
 
     public splitLeaf(
@@ -131,7 +142,6 @@ export class LayoutTree<T extends Window = Window> {
 
     public splitFocused(
         orientation: Orientation,
-        // newWindowId: string,
         newWindow: T,
         fraction = 0.5
     ) {
@@ -139,7 +149,7 @@ export class LayoutTree<T extends Window = Window> {
             return;
 
         this.splitLeaf(this.focused, orientation, newWindow, fraction);
-        const newLeaf = this.findLeaf(newWindow.id);
+        const newLeaf = this.findLeafById(newWindow.id);
 
         if (newLeaf)
             this.focused = newLeaf;
@@ -165,10 +175,57 @@ export class LayoutTree<T extends Window = Window> {
         if (this.focused)
             this.focused.window?.blur();
 
-        const leaf = this.findLeaf(windowId);
+        const leaf = this.findLeafById(windowId);
 
         if (leaf)
             this.focused = leaf;
+    }
+
+    public focusNext() {
+        if (!this.focused)
+            return;
+
+        const nextLeaf = this.findLeaf(this.focused.parent);
+
+        if (nextLeaf) 
+            console.log('focusNext', nextLeaf);
+        else
+            console.log('Cannot find next leaf');
+        
+        // console.log('focusNext', this.focused);
+        // if (!this.focused && this.root?.type === 'split' && this.root.children.length > 0) {
+        //     const nextFocus = this.findLeafById(this.root);
+        //     // console.log(this.root);
+        //     // (this.root as LeafNode).window!.focus();
+        //     // this.focused = this.root as LeafNode;
+        //     // this.focus(this.root.children[0].);
+        //     return;
+        // }
+       
+        // const parent = this.focused.parent;
+
+        // if (!parent) {
+
+        //     return;
+        // }
+
+        // const sibling = parent.children[0] === this.focused ? parent.children[1] : parent.children[0];
+
+
+        // if (sibling.type === 'leaf') {
+
+        //     this.focus(sibling.window!.id);
+
+        //     sibling.window?.focus();
+
+        // else {
+        //     const nextLeaf = this.findLeaf(sibling.);
+
+        //     if (nextLeaf) {
+        //         this.focus(nextLeaf.window!.id);
+        //         nextLeaf.window?.focus();
+        //     }
+        // }
     }
 
     public traverse(callback: (leaf: LeafNode) => void) {
